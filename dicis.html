@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Fuga: A Jornada de um Quilombola em Águas Belas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #3c3c3c;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #555;
+        }
+        h1 {
+            color: #ff9900;
+            text-align: center;
+            border-bottom: 2px solid #ff9900;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .choices {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        button {
+            background-color: #ff9900;
+            color: #1e1e1e;
+            border: none;
+            padding: 15px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #ffb84d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="title">Jogo da Fuga: A Jornada de um Quilombola</h1>
+    <p id="story">Você é Amaro, um homem escravizado em uma fazenda na região que hoje é conhecida como Águas Belas. O cansaço das correntes e a saudade da liberdade queimam em seu peito. A noite está escura e uma oportunidade de fuga se apresenta. O que você faz?</p>
+    <div id="choices" class="choices">
+        <button onclick="startGame()">Iniciar a Fuga</button>
+    </div>
+</div>
+
+<script>
+    const storyElement = document.getElementById('story');
+    const choicesElement = document.getElementById('choices');
+    const titleElement = document.getElementById('title');
+
+    function startGame() {
+        titleElement.innerText = "Fase 1: A Fuga";
+        storyElement.innerText = "O feitor está distraído e a noite é sua aliada. Você corre em direção à mata densa, com o coração disparado. Os sons da fazenda vão ficando para trás, mas o medo da captura é constante. Você precisa se afastar o mais rápido possível. Qual direção seguir?";
+        choicesElement.innerHTML = `
+            <button onclick="fase1_mataFechada()">Seguir pela mata mais fechada, onde é mais difícil de ser visto.</button>
+            <button onclick="fase1_rio()">Tentar seguir o curso de um pequeno rio para despistar os cães.</button>
+        `;
+    }
+
+    function fase1_mataFechada() {
+        storyElement.innerText = "A mata é escura e cheia de espinhos que rasgam sua pele. O cansaço começa a pesar, mas a adrenalina te mantém em movimento. De repente, você ouve latidos à distância. Eles estão no seu rastro! O que fazer?";
+        choicesElement.innerHTML = `
+            <button onclick="fase1_esconder()">Procurar um lugar para se esconder e esperar que passem.</button>
+            <button onclick="fase1_correrMais()">Acelerar o passo, ignorando a dor e o cansaço.</button>
+        `;
+    }
+
+    function fase1_rio() {
+        storyElement.innerText = "A água gelada do rio dificulta a caminhada, mas você sabe que isso pode confundir os cães. A correnteza é forte em alguns trechos e você precisa se segurar nas margens para não ser levado. Depois de um tempo, você sai do rio e percebe que os latidos cessaram. Você conseguiu despistá-los por enquanto. Você avança pela mata e o dia começa a amanhecer.";
+        choicesElement.innerHTML = `
+            <button onclick="iniciarFase2()">Continuar a jornada.</button>
+        `;
+    }
+    
+    function fase1_esconder() {
+        storyElement.innerText = "Você encontra uma pequena gruta e se esconde, prendendo a respiração. Os latidos se aproximam e você ouve as vozes dos capitães-do-mato. Por um momento, um deles para bem perto da sua localização. Seu coração quase para. Mas, para seu alívio, eles continuam, e as vozes e os latidos se afastam. Você esperou o dia amanhecer para ter certeza que estava seguro. ";
+        choicesElement.innerHTML = `
+            <button onclick="iniciarFase2()">Continuar a jornada.</button>
+        `;
+    }
+
+    function fase1_correrMais() {
+        storyElement.innerText = "Você corre desesperadamente, mas o cansaço e os ferimentos te deixam mais lento. Os latidos estão cada vez mais próximos. Em pouco tempo, os cães te alcançam e os capitães-do-mato te capturam. Sua busca pela liberdade terminou. Fim de jogo.";
+        choicesElement.innerHTML = `
+            <button onclick="startGame()">Tentar Novamente</button>
+        `;
+    }
+
+    function iniciarFase2() {
+        titleElement.innerText = "Fase 2: A Vida no Meio do Mato";
+        storyElement.innerText = "Você está há dias na mata. A fome e o cansaço são seus companheiros constantes. Você precisa encontrar comida e um lugar seguro para descansar. Você avista uma clareira com algumas árvores frutíferas, mas o local é muito exposto. Você também vê rastros de animais que podem te levar a uma fonte de água, mas também a predadores.";
+        choicesElement.innerHTML = `
+            <button onclick="fase2_clareira()">Arriscar ir até a clareira para pegar frutas.</button>
+            <button onclick="fase2_rastros()">Seguir os rastros dos animais.</button>
+        `;
+    }
+
+    function fase2_clareira() {
+        storyElement.innerText = "As frutas são doces e matam parte da sua fome. Enquanto se alimenta, você ouve um barulho de galho quebrando. Você se esconde rapidamente e vê um grupo de homens brancos, caçadores, passando perto da clareira. Por sorte, eles não te viram. Você aprendeu uma lição valiosa sobre a importância da cautela.";
+        choicesElement.innerHTML = `
+            <button onclick="fase2_continuacao()">Continuar sua jornada.</button>
+        `;
+    }
+
+    function fase2_rastros() {
+        storyElement.innerText = "Você segue os rastros e encontra uma pequena nascente de água limpa. A água fresca renova suas energias. Ao beber, você percebe marcas e símbolos estranhos em algumas árvores. Você não os reconhece, mas sente que está em território alheio. A sensação de estar sendo observado é forte.";
+        choicesElement.innerHTML = `
+            <button onclick="fase2_continuacao()">Continuar com cautela.</button>
+        `;
+    }
+    
+    function fase2_continuacao() {
+        storyElement.innerText = "Os dias se passam e você aprende a sobreviver na mata. Você caça pequenos animais e reconhece plantas comestíveis. Um dia, você encontra pegadas que não são de animais nem de homens brancos. São de pessoas descalças, que se movem com agilidade pela floresta. Você sabe que pode ser um povo indígena. A lembrança das histórias contadas na senzala, sobre a hostilidade de alguns grupos, te deixa em alerta.";
+        choicesElement.innerHTML = `
+            <button onclick="fase2_evitarIndigenas()">Tentar desviar do caminho das pegadas.</button>
+            <button onclick="fase2_observarIndigenas()">Seguir as pegadas à distância para saber mais.</button>
+        `;
+    }
+
+    function fase2_evitarIndigenas() {
+        storyElement.innerText = "Você muda de rota, tentando evitar qualquer contato. Mas a floresta tem seus próprios donos. Dias depois, você cai em uma armadilha e é cercado por guerreiros indígenas. Eles te olham com desconfiança. Um deles, que parece ser o líder, se aproxima. Fim de Jogo. O encontro foi inevitável.";
+        choicesElement.innerHTML = `
+            <button onclick="startGame()">Tentar Novamente</button>
+        `;
+    }
+    
+    function fase2_observarIndigenas() {
+        storyElement.innerText = "Com muito cuidado, você segue as pegadas e avista uma aldeia. Você se esconde e observa. Vê mulheres, crianças e homens em suas atividades diárias. Eles não parecem violentos, mas você sabe que sua presença pode ser vista como uma ameaça. Enquanto observa, um jovem indígena que estava caçando te surpreende. Ele te encara, sem hostilidade, mas com curiosidade. Ele faz um sinal para que você o siga.";
+        choicesElement.innerHTML = `
+            <button onclick="iniciarFase3()">Seguir o jovem indígena.</button>
+        `;
+    }
+    
+    function iniciarFase3() {
+        titleElement.innerText = "Fase 3: O Quilombo";
+        storyElement.innerText = "O jovem indígena te guia por um caminho escondido e, para sua surpresa, te leva a uma clareira onde vive uma comunidade de negros. Um quilombo! O alívio inunda seu coração. No entanto, ao ser apresentado ao líder do quilombo, um homem mais velho chamado Zumbi, você percebe que a acolhida não é incondicional. 'Mais uma boca para alimentar e mais um risco para todos nós', diz ele, com o olhar severo.";
+        choicesElement.innerHTML = `
+            <button onclick="fase3_argumentar()">Argumentar que você pode ser útil para a comunidade.</button>
+            <button onclick="fase3_silencio()">Permanecer em silêncio, mostrando respeito pela autoridade dele.</button>
+        `;
+    }
+    
+    function fase3_argumentar() {
+        storyElement.innerText = "Você explica suas habilidades: sabe construir abrigos, conhece as plantas e pode ajudar na defesa do quilombo. Sua determinação e suas palavras firmes impressionam Zumbi e outros membros da comunidade. 'Veremos', diz o líder, 'mas por agora, você pode ficar. Prove seu valor.'";
+        choicesElement.innerHTML = `
+            <button onclick="fase3_finalBom()">Você conseguiu seu lugar no quilombo!</button>
+        `;
+    }
+
+    function fase3_silencio() {
+        storyElement.innerText = "Seu silêncio é interpretado como submissão, mas também como falta de iniciativa. Zumbi te aceita na comunidade, mas com desconfiança. Você terá que trabalhar duro para provar que não é apenas um fardo. A luta pela liberdade continua, agora dentro do próprio quilombo.";
+         choicesElement.innerHTML = `
+            <button onclick="fase3_finalMedio()">Você foi aceito, mas terá que conquistar a confiança de todos.</button>
+        `;
+    }
+    
+    function fase3_finalBom() {
+        titleElement.innerText = "O Fim da Fuga, o Começo da Luta";
+        storyElement.innerText = "Você se integra à vida no quilombo. Participa das caçadas, ajuda a construir defesas e compartilha suas histórias com seus novos irmãos. A vida não é fácil, e a ameaça dos brancos é constante, mas pela primeira vez em muito tempo, você se sente livre e parte de algo maior. Sua jornada de fuga terminou, mas a luta pela liberdade de seu povo está apenas começando. Parabéns!";
+        choicesElement.innerHTML = `
+            <button onclick="startGame()">Jogar Novamente</button>
+        `;
+    }
+
+    function fase3_finalMedio() {
+        titleElement.innerText = "Um Novo Desafio";
+        storyElement.innerText = "Os dias no quilombo são de trabalho árduo e vigilância constante. Você se esforça para mostrar seu valor, mas a desconfiança de alguns ainda paira sobre você. A liberdade tem um preço, e você entende que ela precisa ser conquistada todos os dias, não apenas na fuga, mas na construção de uma nova vida em comunidade. Sua jornada é incerta, mas a esperança te fortalece. Parabéns por chegar até aqui!";
+        choicesElement.innerHTML = `
+            <button onclick="startGame()">Jogar Novamente</button>
+        `;
+    }
+
+</script>
+
+</body>
+</html>
