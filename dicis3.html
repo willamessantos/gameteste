@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Fuga: A Jornada pela Liberdade</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #2c2a2a;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
+            border: 1px solid #555;
+            overflow: hidden;
+        }
+        .game-visual {
+            position: relative;
+            text-align: center;
+            color: white;
+        }
+        #scene-image {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-bottom: 3px solid #e08e0b;
+            filter: brightness(0.7);
+        }
+        #title {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            margin: 0;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px #000;
+        }
+        .game-content {
+            padding: 25px;
+            display: flex;
+            gap: 25px;
+        }
+        .player-panel {
+            flex-basis: 200px;
+            flex-shrink: 0;
+            text-align: center;
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+        #player-portrait {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid #e08e0b;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+        #player-name {
+            font-weight: bold;
+            font-size: 1.4em;
+            color: #e08e0b;
+        }
+        #player-status {
+            font-size: 1em;
+            color: #ccc;
+            margin-top: 5px;
+        }
+        .narrative-panel {
+            flex-grow: 1;
+        }
+        #story {
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-align: justify;
+            min-height: 120px;
+        }
+        .choices {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            background-color: #e08e0b;
+            color: #1e1e1e;
+            border: none;
+            padding: 15px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            font-weight: bold;
+            text-align: left;
+        }
+        button:hover {
+            background-color: #ffb84d;
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .game-content {
+                flex-direction: column;
+            }
+            .player-panel {
+                flex-basis: auto;
+                margin-bottom: 20px;
+            }
+            #scene-image {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="game-visual">
+        <img id="scene-image" src="https://placehold.co/900x350/201a14/a06c28?text=Escravidão+e+Resistência" alt="Cenário do Jogo">
+        <h1 id="title">A Jornada pela Liberdade</h1>
+    </div>
+    <div class="game-content">
+        <div class="player-panel">
+            <img id="player-portrait" src="https://placehold.co/150x150/503822/FFFFFF?text=Escolha" alt="Retrato do Jogador">
+            <div id="player-name"></div>
+            <div id="player-status">Aguardando Escolha</div>
+        </div>
+        <div class="narrative-panel">
+            <p id="story">Bem-vindo(a) à Jornada pela Liberdade. Antes de iniciar sua fuga, escolha quem você será:</p>
+            <div id="choices" class="choices">
+                <button onclick="selectCharacter('Amaro')">Escolher Amaro (Homem Quilombola)</button>
+                <button onclick="selectCharacter('Dandara')">Escolher Dandara (Mulher Quilombola)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const titleElement = document.getElementById('title');
+    const storyElement = document.getElementById('story');
+    const choicesElement = document.getElementById('choices');
+    const sceneImageElement = document.getElementById('scene-image');
+    const playerPortraitElement = document.getElementById('player-portrait');
+    const playerNameElement = document.getElementById('player-name');
+    const playerStatusElement = document.getElementById('player-status');
+
+    let currentPlayer = {
+        name: "",
+        gender: "",
+        portrait: ""
+    };
+
+    const characterData = {
+        Amaro: {
+            gender: "homem",
+            portrait: "https://placehold.co/150x150/503822/FFFFFF?text=Amaro",
+            initialStory: "Você é Amaro, um homem escravizado em uma fazenda na região que hoje é conhecida como Águas Belas. O cansaço das correntes e a saudade da liberdade queimam em seu peito. A noite está escura e uma oportunidade de fuga se apresenta. O que você faz?"
+        },
+        Dandara: {
+            gender: "mulher",
+            portrait: "https://placehold.co/150x150/703040/FFFFFF?text=Dandara",
+            initialStory: "Você é Dandara, uma mulher escravizada em uma fazenda na região que hoje é conhecida como Águas Belas. O peso das correntes e a chama da liberdade ardem em sua alma. A noite está escura e uma oportunidade de fuga se apresenta. O que você faz?"
+        }
+    };
+
+    const scenes = {
+        start: {
+            title: "A Jornada pela Liberdade",
+            story: "Bem-vindo(a) à Jornada pela Liberdade. Antes de iniciar sua fuga, escolha quem você será:",
+            image: "https://placehold.co/900x350/201a14/a06c28?text=Escravidão+e+Resistência",
+            status: "Aguardando Escolha",
+            choices: [
+                { text: "Escolher Amaro (Homem Quilombola)", action: "selectCharacter('Amaro')" },
+                { text: "Escolher Dandara (Mulher Quilombola)", action: "selectCharacter('Dandara')" }
+            ]
+        },
+        fase1: {
+            title: "Fase 1: A Corrida",
+            story: (player) => `Você corre para a mata densa, coração disparado. Os sons da fazenda somem, mas o medo da captura é um chicote em suas costas. Para onde ir, ${player.name}?`,
+            image: "https://placehold.co/900x350/1a2e1a/6b8e6b?text=Mata+Fechada",
+            status: "Alerta",
+            choices: [
+                { text: "Pela mata mais fechada, para se esconder.", action: "fase1_mataFechada" },
+                { text: "Seguir o curso de um rio para despistar cães.", action: "fase1_rio" }
+            ]
+        },
+        fase1_mataFechada: {
+            title: "Fase 1: Perseguido",
+            story: (player) => `Espinhos rasgam sua pele na escuridão. O cansaço pesa, mas você continua. De repente, latidos ao longe. Eles estão no seu rastro, ${player.name}! O que fazer?`,
+            image: "https://placehold.co/900x350/1a2e1a/6b8e6b?text=Mata+Fechada",
+            status: "Amedrontado",
+            choices: [
+                { text: "Se esconder e esperar que passem.", action: "fase1_esconder" },
+                { text: "Acelerar, ignorando a dor.", action: "fase1_correrMais" }
+            ]
+        },
+        fase1_rio: {
+            title: "Fase 1: Despiste",
+            story: (player) => `A água gelada do rio confunde o faro dos cães, mas a correnteza quase te leva. Com esforço, você alcança a outra margem. Os latidos cessaram, ${player.name}. Você conseguiu.`,
+            image: "https://placehold.co/900x350/2a3a50/8a9aaf?text=Rio+à+Noite",
+            status: "Exausto, mas Salvo",
+            choices: [
+                { text: "Continuar a jornada ao amanhecer.", action: "iniciarFase2" }
+            ]
+        },
+        fase1_esconder: {
+            title: "Fase 1: Por um Fio",
+            story: (player) => `Você se esconde em uma gruta, coração na boca. Os capitães-do-mato passam tão perto que você pode ouvi-los praguejar. Eles se afastam. A noite te protegeu, ${player.name}.`,
+            image: "https://placehold.co/900x350/1a2e1a/6b8e6b?text=Gruta+Escura",
+            status: "Aliviado",
+            choices: [
+                { text: "Continuar a jornada ao amanhecer.", action: "iniciarFase2" }
+            ]
+        },
+        fase1_correrMais: {
+            title: "Fim de Jogo",
+            story: (player) => `O cansaço vence. Suas pernas fraquejam e os cães te cercam, seguidos pelos seus captores. A liberdade era um sonho breve, ${player.name}. Sua fuga terminou.`,
+            image: "https://placehold.co/900x350/502a2a/000000?text=Capturado",
+            status: "Capturado",
+            choices: [
+                { text: "Tentar Novamente", action: "resetGame" }
+            ]
+        },
+        iniciarFase2: {
+            title: "Fase 2: Sobrevivência",
+            story: (player) => `Dias na mata. A fome é uma dor constante. Você precisa de comida. Uma clareira com árvores frutíferas parece um banquete, mas é perigosamente exposta. Outra opção é seguir rastros de animais até a água, ${player.name}.`,
+            image: "https://placehold.co/900x350/4a602a/b0c08a?text=Clareira+na+Mata",
+            status: "Faminto",
+            choices: [
+                { text: "Arriscar pegar as frutas.", action: "fase2_frutas" },
+                { text: "Seguir os rastros em busca de água.", action: "fase2_rastros" }
+            ]
+        },
+        fase2_frutas: {
+            title: "Fase 2: Um Risco Calculado",
+            story: (player) => `As frutas são um alívio. Enquanto come, você ouve vozes e se esconde. Caçadores brancos passam perto, sem te notar. A sorte esteve ao seu lado, ${player.name}.`,
+            image: "https://placehold.co/900x350/4a602a/b0c08a?text=Caçadores",
+            status: "Satisfeito, mas Cauteloso",
+            choices: [
+                { text: "Continuar com mais cuidado.", action: "fase2_encontro" }
+            ]
+        },
+        fase2_rastros: {
+            title: "Fase 2: Sinais na Mata",
+            story: (player) => `Os rastros te levam a uma nascente de água pura. A água renova seu espírito. Perto dali, você vê marcas estranhas em árvores. Símbolos que não conhece. Você está em território indígena, ${player.name}.`,
+            image: "https://placehold.co/900x350/3a5a60/9ab0b5?text=Nascente",
+            status: "Revigorado, mas Intrigado",
+            choices: [
+                { text: "Avançar com respeito e atenção.", action: "fase2_encontro" }
+            ]
+        },
+        fase2_encontro: {
+            title: "Fase 2: O Outro Povo",
+            story: (player) => `Dias depois, você encontra pegadas de pessoas descalças. Você sabe que está perto de uma aldeia indígena. As histórias da senzala te alertam, mas a solidão pesa. O que fazer, ${player.name}?`,
+            image: "https://placehold.co/900x350/6b4a2e/c0a080?text=Aldeia+à+Distância",
+            status: "Hesitante",
+            choices: [
+                { text: "Tentar contornar a área.", action: "fase2_evitar" },
+                { text: "Observar de longe, com cautela.", action: "fase2_observar" }
+            ]
+        },
+        fase2_evitar: {
+            title: "Fim de Jogo",
+            story: (player) => `Ao tentar desviar, você não percebe a armadilha no chão. Guerreiros surgem da mata, lanças apontadas. Sua desconfiança te levou a uma armadilha, ${player.name}. A floresta tem donos.`,
+            image: "https://placehold.co/900x350/502a2a/000000?text=Emboscada",
+            status: "Capturado",
+            choices: [
+                { text: "Tentar Novamente", action: "resetGame" }
+            ]
+        },
+        fase2_observar: {
+            title: "Fase 2: O Contato",
+            story: (player) => `Escondido, você observa a vida na aldeia. É pacífica. De repente, um jovem caçador te encontra. Não há ódio em seus olhos, apenas surpresa. Ele faz um gesto para que você o siga, ${player.name}.`,
+            image: "https://placehold.co/900x350/6b4a2e/c0a080?text=Encontro",
+            status: "Surpreso",
+            choices: [
+                { text: "Confiar e segui-lo.", action: "iniciarFase3" }
+            ]
+        },
+        iniciarFase3: {
+            title: "Fase 3: O Quilombo",
+            story: (player) => `Para sua surpresa, o jovem te guia até um quilombo escondido! Seus irmãos e irmãs. Mas o líder, Zumbi, te encara com desconfiança. 'Mais uma boca para alimentar, mais um risco para todos nós', diz ele, ${player.name}.`,
+            image: "https://placehold.co/900x350/4e4a3a/a0a080?text=Quilombo",
+            status: "Esperançoso, mas Tenso",
+            choices: [
+                { text: "Argumentar que você pode ser útil para a comunidade.", action: "fase3_argumentar" },
+                { text: "Permanecer em silêncio, mostrando respeito.", action: "fase3_silencio" }
+            ]
+        },
+        fase3_argumentar: {
+            title: "O Fim da Fuga",
+            story: (player) => `Você fala de suas habilidades para construir, caçar e lutar. Sua firmeza impressiona o líder. 'Prove seu valor com ações, não palavras', diz Zumbi, mas ele te permite ficar. Você encontrou seu lugar, ${player.name}.`,
+            image: "https://placehold.co/900x350/4e4a3a/a0a080?text=Comunidade",
+            status: "Aceito",
+            choices: [
+                { text: "Jogar Novamente", action: "resetGame" }
+            ]
+        },
+        fase3_silencio: {
+            title: "Um Novo Desafio",
+            story: (player) => `Seu silêncio é visto como submissão. Você é aceito, mas a desconfiança permanece. A luta pela liberdade continua, agora para conquistar a confiança de seus irmãos e irmãs.`,
+            image: "https://placehold.co/900x350/4e4a3a/a0a080?text=Trabalho+Duro",
+            status: "Aceito com ressalvas",
+            choices: [
+                { text: "Jogar Novamente", action: "resetGame" }
+            ]
+        }
+    };
+
+    function selectCharacter(charName) {
+        currentPlayer.name = charName;
+        currentPlayer.gender = characterData[charName].gender;
+        currentPlayer.portrait = characterData[charName].portrait;
+
+        playerNameElement.innerText = currentPlayer.name;
+        playerPortraitElement.src = currentPlayer.portrait;
+        playerStatusElement.innerText = "Determinado";
+
+        changeScene('fase1');
+        storyElement.innerText = characterData[charName].initialStory; // Define a história inicial com base no personagem
+    }
+
+    function changeScene(sceneKey) {
+        const scene = scenes[sceneKey];
+        
+        titleElement.innerText = scene.title;
+        
+        // Se a história é uma função, chame-a com o jogador atual
+        if (typeof scene.story === 'function') {
+            storyElement.innerText = scene.story(currentPlayer);
+        } else {
+            storyElement.innerText = scene.story;
+        }
+
+        sceneImageElement.src = scene.image;
+        playerStatusElement.innerText = scene.status;
+
+        // Atualiza o retrato apenas se houver uma nova imagem na cena (para capturas, por exemplo)
+        if (scene.portrait) {
+            playerPortraitElement.src = scene.portrait;
+        } else {
+             playerPortraitElement.src = currentPlayer.portrait; // Mantém o retrato do jogador escolhido
+        }
+
+        choicesElement.innerHTML = '';
+        scene.choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.innerText = choice.text;
+            // Para resetar o jogo ou selecionar personagem, precisamos de uma lógica diferente
+            if (choice.action === "resetGame") {
+                button.setAttribute('onclick', `resetGame()`);
+            } else if (choice.action.startsWith("selectCharacter")) {
+                button.setAttribute('onclick', choice.action);
+            }
+            else {
+                button.setAttribute('onclick', `changeScene('${choice.action}')`);
+            }
+            choicesElement.appendChild(button);
+        });
+    }
+
+    function resetGame() {
+        currentPlayer = { name: "", gender: "", portrait: "" }; // Limpa o jogador
+        playerNameElement.innerText = "";
+        playerPortraitElement.src = "https://placehold.co/150x150/503822/FFFFFF?text=Escolha";
+        playerStatusElement.innerText = "Aguardando Escolha";
+        changeScene('start');
+    }
+
+    // Iniciar o jogo na tela de seleção de personagem
+    changeScene('start');
+</script>
+
+</body>
+</html>
